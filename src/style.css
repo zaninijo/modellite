@@ -1,6 +1,7 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
+  text-anchor: middle;
   font-weight: 400;
   font-size: 5.8pt;
   color-scheme: light dark;
@@ -11,6 +12,13 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+#page {
+  height: 297mm;
+  width: 210mm;
+  outline: black solid 1px;
+  display: none;
+} 
 
 nowrap {
   white-space: nowrap;
@@ -31,7 +39,7 @@ nowrap {
 }
 
 .logo-area {
-  padding: 1.5mm;
+  padding: 1.25mm;
   display: flex;
   align-items: start  ;
 }
@@ -64,8 +72,8 @@ a:hover {
   padding: 1mm;
   max-height: 38.143mm;
   max-width: 99mm;
-  min-height: 38.143mm;
-  min-width: 99mm;
+  height: 38.143mm;
+  width: 99mm;
   display: flex;
 }
 
@@ -93,11 +101,11 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 1mm;
-  justify-content: center;
+  justify-content: space-around;
 }
 
 .inst-list li {
-  text-justify: auto;
+  letter-spacing: .02em;
   line-height: 1.3;
   font-size: 6pt;
 }
@@ -138,4 +146,20 @@ a:hover {
   display: flex;
   flex-direction: column;
   min-width: 50%;
+}
+
+@media print {
+  body {
+    margin: 0;
+  }
+  :not(#page) {
+    display: none;
+  }
+  #page {
+    display: initial;
+  }
+}
+
+@page {
+  margin: 0;
 }
