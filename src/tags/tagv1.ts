@@ -1,0 +1,265 @@
+import { createTemplate } from "../tags";
+import type { TagValuesBase, TagTemplate } from "../tags";
+
+const TEMPLATE_NAME = "Etiqueta Base Água V1"
+const CLASS_NAME = "tag-v1";
+
+export interface TagValuesV1 extends TagValuesBase {
+  "name": string;
+  "quantity": string;
+  "size": string;
+  "color": string;
+  "man-date": string;
+  "extras": {
+    "apply-temp": string
+    "ink-type": string
+    "exp-span": string
+  }
+}
+
+const tagDataLabel: {[K in keyof TagValuesV1]: string} = {
+    "name": "Nome",
+    "quantity": "Quantidade",
+    "color": "Cor",
+    "size": "Tamanho",
+    "man-date": "Data de Fabricação",
+    "extras": "Outras opções"
+} as const;
+
+const extraTagDataLabel: {[K in keyof TagValuesV1["extras"]]: string} = {
+    "apply-temp": "Temperatura de aplicação",
+    "ink-type": "Tipo da tinta",
+    "exp-span": "Validade"
+} as const;
+
+const css = /*css*/`
+  .${CLASS_NAME} {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-size: 5.8pt;
+    color: rgba(0,0,0,1);
+    border: .5pt black solid;
+    padding: 1mm;
+    max-height: 38.143mm;
+    max-width: 99mm;
+    height: 38.143mm;
+    width: 99mm;
+    display: flex;
+    box-sizing: border-box;
+  }
+
+  .${CLASS_NAME} .inner-tag {
+    display: flex;
+    flex-direction: row;
+    border: .8pt black solid;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .${CLASS_NAME} .vertical-separator {
+    border-left: black .8pt solid;
+  }
+
+  .${CLASS_NAME} .logo-area {
+    padding: 1.25mm;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .${CLASS_NAME} .logo {
+    width: 100%;
+  }
+
+  .${CLASS_NAME} .value-title {
+    color: red;
+    font-weight: 500;
+    display: inline;
+  }
+
+  .${CLASS_NAME} .info-output {
+    font-size: 11pt;
+    margin-block: -.15em;
+    font-weight: 500;
+    overflow: hidden;
+    flex-grow: 1;
+  }
+
+  .${CLASS_NAME} .medium {
+    font-size: 7.5pt !important;
+    font-weight: 400 !important;
+  }
+
+  .${CLASS_NAME} .inst-area {
+    padding: 1mm;
+    display: flex;
+    flex-direction: column;
+    gap: 1mm;
+    justify-content: space-around;
+  }
+
+  .${CLASS_NAME} .inst-sect {
+    display: flex;
+    gap: 2.5mm;
+  }
+
+  .${CLASS_NAME} .inst-sect .value-title {
+    min-width: 30%;
+  }
+
+  .${CLASS_NAME} .inst-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: fit-content;
+  }
+
+  .${CLASS_NAME} .inst-list li {
+    letter-spacing: .02em;
+    line-height: 1.3;
+    font-size: 6pt;
+  }
+
+  .${CLASS_NAME} .inst-list li::marker {
+    content: " - ";
+  }
+
+  .${CLASS_NAME} .inner-cell {
+    padding: .5mm;
+    display: flex;
+    flex-direction: row;
+    gap: 1mm;
+    align-items: center;
+  }
+
+  .${CLASS_NAME} .data-area {
+    display: flex;
+    flex-direction: column;
+    min-width: 50%;
+  }
+`
+
+const html = /*html*/` <div class="${CLASS_NAME}">
+  <div class="inner-tag">
+    <div class="data-area">
+      <div class="logo-area" style="border-bottom: .8pt solid black">
+        <img class="logo" src="/logo.svg" id="logo">
+      </div>
+      <div class="inner-cell" style="border-bottom: .8pt solid black;">
+        <span class="value-title">PRODUTO</span>
+        <span class="info-output" id="name">Nome do Produto</span>
+      </div>
+      <div style="display: flex; gap: .2mm; border-bottom: .8pt solid black;">
+        <div class="inner-cell" style="min-width: 30%;">
+          <span class="value-title">QUANT.</span>
+          <span class="info-output" id="amount">000</span>
+        </div>
+        <div class="vertical-separator"></div>
+        <div class="inner-cell" style="flex-grow: 1;">
+          <span class="value-title">TAM.</span>  
+          <span class="info-output" id="size">Valor</span>
+        </div>
+      </div>
+      <div class="inner-cell" style="border-bottom: .8pt solid black;">
+        <span class="value-title">COR</span>
+        <span class="info-output" id="color">Nome da Cor</span>
+      </div>
+      <div style="display: flex; flex-grow: 1;">
+        <div style="flex-grow: 1; min-width: 75%; display: flex; flex-direction: column;">
+          <div class="inner-cell" style="border-bottom: .8pt black solid; flex-grow: 1">
+            <span class="value-title">FABRICADO EM</span>
+            <span class="info-output medium" style="text-align: center;" id="man-date">00/00/0000</span>
+          </div>
+          <div class="inner-cell" style="flex-grow: 1">
+            <span class="value-title">VALIDADE</span>
+            <span class="info-output medium" id="exp-date" style="text-align: center;">0 MESES</span>
+          </div>
+        </div>
+        <div class="vertical-separator"></div>
+        <div class="inner-cell" style="flex-direction: column; justify-content: flex-start;">
+          <span class="value-title">TINTA</span>
+          <span class="info-output medium" id="ink-type" style="text-align: center;">BASE <nowrap>D´ÁGUA</nowrap></span>
+        </div>
+      </div>
+    </div>
+    <div class="vertical-separator"></div>
+    <div class="inst-area">
+      <div class="inst-sect">
+        <span class="value-title">APLICAÇÃO</span>
+        <ul class="inst-list">
+          <li>
+            TEMPERATURA: 160°C
+          </li>
+          <li>
+            PRESSÃO: FORTE - 80 / 100 PSI
+          </li>
+          <li>
+            TEMPO: 12  A 15 SEGUNDOS
+          </li>
+          <li>
+            RETIRA: FRIO
+          </li>
+          <li>
+            TECIDO: CLARO / ESCURO
+          </li>
+        </ul>
+      </div>
+
+      <div class="inst-sect">
+        <span class="value-title">INFORMAÇÕES</span>
+        <ul class="inst-list">
+          <li>
+            ARMAZENAR O TRANSFER EM LOCAL SECO LIVRE DE UMIDADE. 
+          </li>
+          <li>
+            PROBLEMAS OU DUVIDAS ENTRAR EM CONTATO COM NOSSA PARTE TÉCNICA.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>`
+
+const fragment = createTemplate(html);
+
+const tagInputsQuery = [...Object.keys(tagDataLabel), ...Object.keys(extraTagDataLabel)];
+
+const tagOutputs = tagInputsQuery.reduce((map, query) => {
+  const el = fragment.getElementById(query);
+
+  if (!el) {
+    throw new Error(
+      `Erro ao carregar a etiqueta "${TEMPLATE_NAME}": O elemento de output "${query}" não foi encontrado.`
+    );
+  }
+
+  return { ...map, [query]: el };
+}, {} as {[selector: string]: HTMLElement});
+
+const defaultValues = Object.keys(tagOutputs).reduce((map, id) => {
+  
+  const tagEl = tagOutputs[id];
+  const value = tagEl.firstElementChild?.innerHTML ?? "Indefinido";
+  
+  // Verifica se é valor extra
+  if (Object.hasOwn(extraTagDataLabel, id)) {
+    return {
+      ["extras"]: {
+        ...(map["extras"] as {[entry: string]: string}),
+        [id]: value
+      }
+    }
+  }
+
+  return {
+    ...map,
+    [id]: value
+  }
+}, {} as TagValuesBase);
+
+export const template: TagTemplate = {
+  templateName: TEMPLATE_NAME,
+  templateElement: fragment,
+  tagOutputs,
+  defaultValues
+}
