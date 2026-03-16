@@ -41,8 +41,8 @@ const css = /*css*/`
     color: rgba(0,0,0,1);
     border: .5pt black solid;
     padding: 1mm;
-    max-height: 38.143mm;
-    max-width: 99mm;
+    min-height: 38.143mm;
+    min-width: 99mm;
     height: 38.143mm;
     width: 99mm;
     display: flex;
@@ -152,7 +152,7 @@ const html = /*html*/` <div class="${CLASS_NAME}">
       <div style="display: flex; gap: .2mm; border-bottom: .8pt solid black;">
         <div class="inner-cell" style="min-width: 30%;">
           <span class="value-title">QUANT.</span>
-          <span class="info-output" id="amount">000</span>
+          <span class="info-output" id="quantity">000</span>
         </div>
         <div class="vertical-separator"></div>
         <div class="inner-cell" style="flex-grow: 1;">
@@ -172,13 +172,13 @@ const html = /*html*/` <div class="${CLASS_NAME}">
           </div>
           <div class="inner-cell" style="flex-grow: 1">
             <span class="value-title">VALIDADE</span>
-            <span class="info-output medium" id="exp-date" style="text-align: center;">0 MESES</span>
+            <span class="info-output medium" id="exp-span" style="text-align: center;">0 MESES</span>
           </div>
         </div>
         <div class="vertical-separator"></div>
-        <div class="inner-cell" style="flex-direction: column; justify-content: flex-start;">
+        <div class="inner-cell" style="flex-direction: column; justify-content: flex-start; gap: 0">
           <span class="value-title">TINTA</span>
-          <span class="info-output medium" id="ink-type" style="text-align: center;">BASE <nowrap>D´ÁGUA</nowrap></span>
+          <span class="info-output medium" id="ink-type" style="text-align: center;">BASE D'ÁGUA</span>
         </div>
       </div>
     </div>
@@ -188,7 +188,7 @@ const html = /*html*/` <div class="${CLASS_NAME}">
         <span class="value-title">APLICAÇÃO</span>
         <ul class="inst-list">
           <li>
-            TEMPERATURA: 160°C
+            TEMPERATURA: <span id="apply-temp">160°C</span>
           </li>
           <li>
             PRESSÃO: FORTE - 80 / 100 PSI
@@ -225,6 +225,7 @@ const fragment = createTemplate(html);
 const tagInputsQuery = [...Object.keys(tagDataLabel), ...Object.keys(extraTagDataLabel)];
 
 const tagOutputs = tagInputsQuery.reduce((map, query) => {
+  if (query === "extras") return map;
   const el = fragment.getElementById(query);
 
   if (!el) {
@@ -239,17 +240,18 @@ const tagOutputs = tagInputsQuery.reduce((map, query) => {
 const defaultValues = Object.keys(tagOutputs).reduce((map, id) => {
   
   const tagEl = tagOutputs[id];
-  const value = tagEl.firstElementChild?.innerHTML ?? "Indefinido";
+  const value = tagEl.textContent.trim() ?? "Indefinido";
   
   // Verifica se é valor extra
   if (Object.hasOwn(extraTagDataLabel, id)) {
     return {
+      ...map,
       ["extras"]: {
-        ...(map["extras"] as {[entry: string]: string}),
+        ...(map["extras"] as {}),
         [id]: value
       }
     }
-  }
+  } 
 
   return {
     ...map,
@@ -257,9 +259,11 @@ const defaultValues = Object.keys(tagOutputs).reduce((map, id) => {
   }
 }, {} as TagValuesBase);
 
-export const template: TagTemplate = {
+const template: TagTemplate = {
   templateName: TEMPLATE_NAME,
   templateElement: fragment,
+  templateStyle: css,
   tagOutputs,
   defaultValues
 }
+export default template
