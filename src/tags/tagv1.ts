@@ -1,4 +1,4 @@
-import { createTemplate } from "../tags";
+import { createTemplate } from "../utils";
 import type { TagValuesBase, TagTemplate } from "../tags";
 
 const TEMPLATE_NAME = "Etiqueta Base Água V1"
@@ -188,7 +188,7 @@ const html = /*html*/` <div class="${CLASS_NAME}">
         <span class="value-title">APLICAÇÃO</span>
         <ul class="inst-list">
           <li>
-            TEMPERATURA: <span id="apply-temp">160°C</span>
+            TEMPERATURA: <span id="apply-temp">150°C</span>
           </li>
           <li>
             PRESSÃO: FORTE - 80 / 100 PSI
@@ -222,40 +222,45 @@ const html = /*html*/` <div class="${CLASS_NAME}">
 
 const fragment = createTemplate(html);
 
-const tagInputsQuery = [...Object.keys(tagDataLabel), ...Object.keys(extraTagDataLabel)];
+const tagOutputsQueries = [...Object.keys(tagDataLabel), ...Object.keys(extraTagDataLabel)];
 
-const tagOutputs = tagInputsQuery.reduce((map, query) => {
-  if (query === "extras") return map;
-  const el = fragment.getElementById(query);
+// const tagOutputs = tagInputsQuery.reduce((map, query) => {
+//   if (query === "extras") return map;
+//   const el = fragment.getElementById(query);
 
-  if (!el) {
-    throw new Error(
-      `Erro ao carregar a etiqueta "${TEMPLATE_NAME}": O elemento de output "${query}" não foi encontrado.`
-    );
+//   if (!el) {
+//     throw new Error(
+//       `Erro ao carregar a etiqueta "${TEMPLATE_NAME}": O elemento de output "${query}" não foi encontrado.`
+//     );
+//   }
+
+//   return { ...map, [query]: el };
+// }, {} as {[selector: string]: HTMLElement});
+
+
+const defaultValues = tagOutputsQueries.reduce((map, selector) => {
+  
+  const tagEl = fragment.getElementById(selector);
+  const value = tagEl?.textContent.trim() || "Indefinido";
+  
+  if (selector === "extras") {
+    return map;
   }
 
-  return { ...map, [query]: el };
-}, {} as {[selector: string]: HTMLElement});
-
-const defaultValues = Object.keys(tagOutputs).reduce((map, id) => {
-  
-  const tagEl = tagOutputs[id];
-  const value = tagEl.textContent.trim() ?? "Indefinido";
-  
   // Verifica se é valor extra
-  if (Object.hasOwn(extraTagDataLabel, id)) {
+  if (Object.hasOwn(extraTagDataLabel, selector)) {
     return {
       ...map,
       ["extras"]: {
         ...(map["extras"] as {}),
-        [id]: value
+        [selector]: value
       }
     }
   } 
 
   return {
     ...map,
-    [id]: value
+    [selector]: value
   }
 }, {} as TagValuesBase);
 
@@ -263,7 +268,7 @@ const template: TagTemplate = {
   templateName: TEMPLATE_NAME,
   templateElement: fragment,
   templateStyle: css,
-  tagOutputs,
+  tagOutputs: tagOutputsQueries,
   defaultValues
 }
 export default template

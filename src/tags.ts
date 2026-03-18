@@ -4,7 +4,7 @@ export interface TagTemplate {
     templateName: string;
     templateElement: DocumentFragment;
     templateStyle: string;
-    tagOutputs: {[selector: string]: HTMLElement};
+    tagOutputs: string[];
     defaultValues: TagValuesBase;
 }
 
@@ -20,18 +20,25 @@ interface TagData {
 
 export interface TagConstructor extends Partial<TagData> {
     template: TagTemplate;
+    extraEditable?: boolean;
 }
 
 export class Tag {
     public values: TagValuesBase;
     public amount;
     public template;
+    public extraEditable: boolean;
 
     constructor(data: TagConstructor) {
         const {values, amount, template} = data;
         this.values = values || template.defaultValues;
         this.amount = amount ?? 0;
-        this.template = template;
+        this.extraEditable = data.extraEditable ?? false;
+        // Clona o template para garantir que cada instância tenha seu próprio DOM
+        this.template = {
+            ...template,
+            templateElement: template.templateElement.cloneNode(true) as DocumentFragment
+        };
 
         this.updateData({
             values: this.values,
@@ -39,7 +46,7 @@ export class Tag {
             template: this.template
         });
     }
-    
+
     public updateData(updatedData: TagData) {
 
         // TODO: ao invés disso, mergir os valores
@@ -50,14 +57,24 @@ export class Tag {
                     amount: this.amount,
                     template: updatedData.template
                 }
-            )        
+            );
+            return;
         }
         this.values = updatedData.values;
         this.amount = updatedData.amount;
         
+        if (!this.template.templateElement.firstElementChild) {
+            throw new Error(`Erro ao atualizar etiqueta: O template "${this.template.templateName}" não possui um elemento raiz.`);
+        }
+
         // adicionar dados ao template
-        Object.entries(flattenObject(this.values)).forEach(([key, value]) => {
-            const el = this.template.tagOutputs[key];
+        
+        const flattenedValues = flattenObject(this.values);
+        console.log(flattenedValues)
+        Object.entries(flattenedValues).forEach(([key, value]) => {
+            const tagOutput = this.template.templateElement.getElementById(key)!;
+            console.log(key)
+            const el = tagOutput;
             el.textContent = value;
         });
     }
@@ -69,13 +86,3 @@ export interface TagInstance {
         styleEl: HTMLStyleElement;
     }
 }
-
-export function createTemplate(str: string) {
-    const template = document.createElement("template");
-    template.innerHTML = str.trim();
-
-    if (!template.content.firstElementChild) {
-        throw new Error("Erro ao criar etiqueta: Elemento de etiqueta não foi encontrado.");
-    }
-    return template.content;
-} 

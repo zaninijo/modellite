@@ -12,3 +12,13 @@ export function flattenObject(obj: AnyObject, result: AnyObject = {}): AnyObject
 
   return result;
 }
+
+export function createTemplate(str: string) {
+    const template = document.createElement("template");
+    template.innerHTML = str.trim();
+
+    if (!template.content.firstElementChild) {
+        throw new Error("Erro ao criar etiqueta: Elemento de etiqueta não foi encontrado.");
+    }
+    return template.content;
+} 

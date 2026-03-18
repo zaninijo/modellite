@@ -1,24 +1,26 @@
-import type { TagInstance } from '../tags';
+import { _renderTag } from './main';
+import type { TagInstance } from './tags';
 
-export function createPreviewRow(instanceId: string, instance: TagInstance[string], removeCallback: () => void): HTMLElement {
+export function createPreviewRow(instanceId: string, instance: TagInstance[string], removeCallback: () => void, duplicateCallback: () => void): HTMLElement {
+    
     const row = document.createElement("div");
     row.className = "tag-preview-row";
 
     const preview = document.createElement("div");
     preview.className = "tag-preview";
 
-    const previewContent = instance.tag.template.templateElement.cloneNode(true) as HTMLElement;
+    const previewContent = _renderTag(instance.tag, preview);
 
     // Collect extra field elements
     const extraFieldElements: HTMLElement[] = [];
 
     // Make the template outputs editable in the preview
-    Object.keys(instance.tag.template.tagOutputs).forEach((key) => {
-        const outputEl = previewContent.querySelector(`#${CSS.escape(key)}`) as HTMLElement | null;
+    instance.tag.template.tagOutputs.forEach((selector) => {
+        const outputEl = previewContent.querySelector(`#${CSS.escape(selector)}`) as HTMLElement | null;
         if (!outputEl) return;
 
         // Check if this is an extra field
-        const isExtra = instance.tag.values.extras && typeof instance.tag.values.extras === "object" && key in instance.tag.values.extras;
+        const isExtra = instance.tag.values.extras && typeof instance.tag.values.extras === "object" && selector in instance.tag.values.extras;
 
         if (isExtra) {
             outputEl.classList.add("extra-field");
@@ -38,14 +40,13 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
             const newValue = (event.target as HTMLElement).textContent || "";
             const nextValues = { ...instance.tag.values } as Record<string, any>;
 
-            if (Object.prototype.hasOwnProperty.call(nextValues, key)) {
-                nextValues[key] = newValue;
+            if (Object.prototype.hasOwnProperty.call(nextValues, selector)) {
+                nextValues[selector] = newValue;
             } else if (nextValues.extras && typeof nextValues.extras === "object") {
-                nextValues.extras = { ...nextValues.extras, [key]: newValue };
+                nextValues.extras = { ...nextValues.extras, [selector]: newValue };
             } else {
-                nextValues[key] = newValue;
+                nextValues[selector] = newValue;
             }
-
             instance.tag.updateData({
                 values: nextValues,
                 amount: instance.tag.amount,
@@ -54,11 +55,11 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
         });
     });
 
-    preview.appendChild(previewContent);
+    
 
     const info = document.createElement("div");
     info.className = "tag-preview-info";
-    info.textContent = `${instanceId} — ${instance.tag.template.templateName}`;
+    info.textContent = `${instanceId}`;
 
     const amountInput = document.createElement("input");
     amountInput.type = "number";
@@ -77,7 +78,7 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
     const editExtrasCheckbox = document.createElement("input");
     editExtrasCheckbox.type = "checkbox";
     editExtrasCheckbox.id = `edit-extras-${instanceId}`;
-    editExtrasCheckbox.checked = false; // Start unchecked
+    editExtrasCheckbox.checked = instance.tag.extraEditable; // Start unchecked
 
     const editExtrasLabel = document.createElement("label");
     editExtrasLabel.htmlFor = `edit-extras-${instanceId}`;
@@ -86,6 +87,7 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
 
     // Function to toggle extra fields editing
     const toggleExtraEditing = () => {
+        instance.tag.extraEditable = editExtrasCheckbox.checked;
         extraFieldElements.forEach((el) => {
             if (editExtrasCheckbox.checked) {
                 el.contentEditable = "true";
@@ -105,12 +107,19 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
     removeBtn.className = "tag-preview-remove";
     removeBtn.addEventListener("click", removeCallback);
 
+    const duplicateBtn = document.createElement("button");
+    duplicateBtn.type = "button";
+    duplicateBtn.textContent = "Duplicar";
+    duplicateBtn.className = "tag-preview-duplicate";
+    duplicateBtn.addEventListener("click", duplicateCallback);
+
     row.appendChild(preview);
     row.appendChild(info);
     row.appendChild(amountInput);
     row.appendChild(editExtrasLabel);
     row.appendChild(editExtrasCheckbox);
     row.appendChild(removeBtn);
+    row.appendChild(duplicateBtn);
 
     return row;
 }
