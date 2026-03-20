@@ -1,15 +1,15 @@
-import { _renderTag } from './main';
+import { renderTag } from './main';
 import type { TagInstance } from './tags';
 
 export function createPreviewRow(instanceId: string, instance: TagInstance[string], removeCallback: () => void, duplicateCallback: () => void): HTMLElement {
-    
+
     const row = document.createElement("div");
     row.className = "tag-preview-row";
 
     const preview = document.createElement("div");
     preview.className = "tag-preview";
 
-    const previewContent = _renderTag(instance.tag, preview);
+    const previewContent = renderTag(instance.tag, preview);
 
     // Collect extra field elements
     const extraFieldElements: HTMLElement[] = [];
@@ -55,7 +55,7 @@ export function createPreviewRow(instanceId: string, instance: TagInstance[strin
         });
     });
 
-    
+
 
     const info = document.createElement("div");
     info.className = "tag-preview-info";

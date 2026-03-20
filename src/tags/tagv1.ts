@@ -32,19 +32,19 @@ const extraTagDataLabel: {[K in keyof TagValuesV1["extras"]]: string} = {
     "exp-span": "Validade"
 } as const;
 
-const css = /*css*/`
+const css = /*style*/`
   .${CLASS_NAME} {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
     font-size: 5.8pt;
     color: rgba(0,0,0,1);
-    border: .5pt black solid;
     padding: 1mm;
-    min-height: 38.143mm;
+    min-height: 38mm;
     min-width: 99mm;
-    height: 38.143mm;
-    width: 99mm;
+    height: 100%;
+    width: 100%;
+    flex-grow: 1;
     display: flex;
     box-sizing: border-box;
   }
@@ -79,7 +79,8 @@ const css = /*css*/`
 
   .${CLASS_NAME} .info-output {
     font-size: 11pt;
-    margin-block: -.15em;
+    margin-top: -.15em;
+    margin-bottom: -.15em;
     font-weight: 500;
     overflow: hidden;
     flex-grow: 1;
@@ -172,7 +173,7 @@ const html = /*html*/` <div class="${CLASS_NAME}">
           </div>
           <div class="inner-cell" style="flex-grow: 1">
             <span class="value-title">VALIDADE</span>
-            <span class="info-output medium" id="exp-span" style="text-align: center;">0 MESES</span>
+            <span class="info-output medium" id="exp-span" style="text-align: center;">6 MESES</span>
           </div>
         </div>
         <div class="vertical-separator"></div>
@@ -245,6 +246,18 @@ const defaultValues = tagOutputsQueries.reduce((map, selector) => {
   
   if (selector === "extras") {
     return map;
+  }
+
+  // Utiliza o dia atual para a data de fabricação, como valor padrão
+  if (selector==="man-date") {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return {
+      ...map,
+      [selector]: `${day}/${month}/${year}`
+    }
   }
 
   // Verifica se é valor extra

@@ -13,13 +13,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-#page {
-  height: 297mm;
-  width: 210mm;
-  outline: black solid 1px;
-  display: none;
-} 
-
 nowrap {
   white-space: nowrap;
 }
@@ -42,22 +35,6 @@ nowrap {
   font-weight: 500;
 }
 
-.logo-area {
-  padding: 1.25mm;
-  display: flex;
-  align-items: start  ;
-}
-
-.logo {
-  width: 100%;
-}
-
-.value-title {
-  color: red;
-  font-weight: 500;
-  display: inline;
-}
-
 body {
   background-color: white;
 }
@@ -71,30 +48,33 @@ a:hover {
   color: #535bf2;
 }
 
-.tag {
-  border: .5pt black solid;
-  padding: 1mm;
-  max-height: 38.143mm;
-  max-width: 99mm;
-  height: 38.143mm;
-  width: 99mm;
-  display: flex;
-}
-
 @media print {
-  body {
-    margin: 0;
+  body * {
+    visibility: hidden;
   }
-  :not(#page) {
-    display: none;
+
+  #print-area,
+  #print-area * {
+    visibility: visible;
   }
-  #page {
-    display: initial;
+
+  #print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 
 @page {
   margin: 0;
+}
+
+#print-area {
+  visibility: visible;
+}
+
+.sheet {
+  border: 1px solid #ccc;
 }
 
 nowrap {
@@ -147,11 +127,10 @@ nowrap {
   border-radius: 2px;
 }
 
-/* Estilos para preview normal (não editável) */
-.tag-preview-normal {
-  margin-left: 10px;
+.tag-preview {
+  height: min-content;
+  width: min-content;
 }
-
 
 /* Estilos para input de quantidade no preview */
 .tag-preview-amount {

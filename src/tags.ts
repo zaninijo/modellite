@@ -70,10 +70,8 @@ export class Tag {
         // adicionar dados ao template
         
         const flattenedValues = flattenObject(this.values);
-        console.log(flattenedValues)
         Object.entries(flattenedValues).forEach(([key, value]) => {
             const tagOutput = this.template.templateElement.getElementById(key)!;
-            console.log(key)
             const el = tagOutput;
             el.textContent = value;
         });
@@ -84,5 +82,6 @@ export interface TagInstance {
     [id: string]: {
         tag: Tag;
         styleEl: HTMLStyleElement;
+        color?: string
     }
 }

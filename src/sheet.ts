@@ -23,29 +23,31 @@ export interface SheetLayout {
             count: number;
             gap: number;
         }
+        flowDirection: "column"|"row";
     }
 }
 
-export const A4: SheetLayout = {
+export const A4263: SheetLayout = {
     size: {
         width: 210,
         height: 297
     },
     margin: {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
+        top: 15.15,
+        right: 5,
+        bottom: 15.15,
+        left: 5
     },
     grid: {
         col: {
             count: 2,
-            gap: 3
+            gap: 2
         },
         row: {
             count: 7,
             gap: 0
-        }
+        },
+        flowDirection: "column"
     },
 }
 
@@ -64,8 +66,23 @@ export class Sheet {
         this._element = document.createElement("div");
         this._element.classList.add("sheet");
 
-        this._disabledCells = [];
-        this._disabledCells.fill(false, 0, this.totalCells);
+        this._element.style.width = `${layout.size.width}mm`;
+        this._element.style.height = `${layout.size.height}mm`;
+        this._element.style.maxWidth = `${layout.size.width}mm`;
+        this._element.style.maxHeight = `${layout.size.height}mm`;
+        this._element.style.paddingTop = `${layout.margin.top}mm`;
+        this._element.style.paddingRight = `${layout.margin.right}mm`;
+        this._element.style.paddingBottom = `${layout.margin.bottom}mm`;
+        this._element.style.paddingLeft = `${layout.margin.left}mm`;
+        this._element.style.display = "grid";
+        this._element.style.gridAutoFlow = `${layout.grid.flowDirection}`;
+        this._element.style.gridTemplateColumns = `repeat(${layout.grid.col.count}, 1fr)`;
+        this._element.style.gridTemplateRows = `repeat(${layout.grid.row.count}, 1fr)`;
+        this._element.style.columnGap = `${layout.grid.col.gap}mm`;
+        this._element.style.rowGap = `${layout.grid.row.gap}mm`;
+        this._element.style.boxSizing = "border-box";
+
+        this._disabledCells = new Array(this.totalCells).fill(false);
 
         this.modified = false;
     }
@@ -103,4 +120,4 @@ export class Sheet {
     }
 };
 
-export const defaultLayout = A4
+export const defaultLayout = A4263

@@ -22,3 +22,41 @@ export function createTemplate(str: string) {
     }
     return template.content;
 } 
+
+export async function waitForLazyElements(lazyElements: NodeListOf<Element>): Promise<void> {
+
+  const promises = Array.from(lazyElements).map((el) => {
+    if (el.tagName === "IMG") {
+      const img = el as HTMLImageElement;
+      if (img.complete) return Promise.resolve();
+
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    }
+
+    return new Promise<void>((resolve) => {
+      function check() {
+        const rect = el.getBoundingClientRect();
+
+        // considera "renderizado" quando tem tamanho visível
+        if (rect.width > 0 && rect.height > 0) {
+          return resolve();
+        }
+
+        requestAnimationFrame(check);
+      }
+
+      check();
+    });
+  });
+
+  await Promise.all(promises);
+
+  // garante que o browser pintou tudo
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+}
+
+
+
