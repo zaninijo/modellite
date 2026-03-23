@@ -1,3 +1,4 @@
+import { renderTag, tagInstances } from "./tags";
 
 /**
  * Representa o layout de uma folha de impressão, incluindo suas dimensões, margens e configuração de grade.
@@ -119,5 +120,59 @@ export class Sheet {
         return this._layout;
     }
 };
+
+export const sheetInstances: Sheet[] = [];
+
+export function getTotalEnabledCells() {
+	return sheetInstances.reduce((sum, sheet) => sum + sheet.totalEnabledCells, 0);
+}
+
+export function flushSheets() {
+	sheetInstances.forEach(sheet => {
+		if (!sheet.modified) {
+			sheet.element.remove();
+		} else {
+			sheet.element.replaceChildren();
+		}
+	});
+
+	for (let i = sheetInstances.length - 1; i >= 0; i--) {
+		if (!sheetInstances[i].modified) {
+			sheetInstances.splice(i, 1);
+		}
+	}
+}
+
+const emptyCellEl = document.createElement("div");
+emptyCellEl.classList.add("empty-cell");
+
+export function renderTagSheet(sheet: Sheet, tagIds: string[], target: HTMLElement) {
+
+	const { element: sheetEl, disabledCells, totalEnabledCells, totalCells } = sheet;
+
+	if (totalEnabledCells < tagIds.length) {
+		throw new Error("Número de etiquetas excede o número de células habilitadas na folha.");
+	}
+
+	if (tagIds.length <= 0) {
+		throw new Error("Número de etiquetas não pode ser igual ou menor que zero.")
+	}
+	
+	target.appendChild(sheetEl);
+	
+	for (let i = 0; i < totalCells; i++) {
+		if (disabledCells[i]) {
+			sheetEl.appendChild(emptyCellEl.cloneNode(true));
+			continue
+		}
+
+		const tagId = tagIds.shift()!;
+
+		const tagInst = tagInstances[tagId];
+		renderTag(tagInst.tag, sheetEl);
+		
+		if (tagIds[0] === undefined) break;
+	}
+}
 
 export const defaultLayout = A4263

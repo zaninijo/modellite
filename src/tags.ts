@@ -78,10 +78,119 @@ export class Tag {
     }
 }
 
-export interface TagInstance {
+export interface TagInstances {
     [id: string]: {
         tag: Tag;
         styleEl: HTMLStyleElement;
         color?: string
     }
+}
+
+let tagCounter = 0;
+
+function claimTagId(name: string) {
+    const n = tagCounter.valueOf();
+    tagCounter++;
+    return `${name}-${n}`;
+
+}
+
+export const tagInstances: TagInstances = {};
+export const tagSorting: string[] = [];
+
+export function addTagInstance(tagCons: TagConstructor, posIndex?: number): void {
+    const { template } = tagCons;
+    const { templateName } = template;
+
+    let styleEl = document.getElementById(templateName) as HTMLStyleElement;
+
+    const normalizedName = templateName.trim().normalize();
+
+    if (styleEl === null) {
+        styleEl = document.createElement("style");
+        styleEl.textContent = template.templateStyle;
+        document.body.prepend(styleEl);
+        styleEl.id = normalizedName;
+    }
+
+    const instId = claimTagId(normalizedName);
+
+    tagInstances[instId] = {
+        tag: new Tag(tagCons),
+        styleEl
+    }
+
+    posIndex !== undefined
+        ? tagSorting.splice(posIndex, 0, instId)
+        : tagSorting.push(instId)
+    ;
+    
+    distributeColors();
+}
+
+
+export function distributeColors() {
+    const colors: string[] = [];
+    const amount = tagSorting.length;
+
+    for (let i = 0; i < amount; i++) {
+        const hue = Math.round((360 / amount) * i);
+        const saturation = 80;
+        const lightness = 50;
+
+        colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+    }
+
+    tagSorting.forEach((id, i) => {
+        tagInstances[id].color = colors[i];
+    });
+}
+
+export function getTagCount() {
+    return Object.values(tagInstances).reduce((sum, inst) => sum + inst.tag.amount, 0);
+}
+
+export function duplicateTagInstance(instanceId: string): void {
+    const instance = tagInstances[instanceId];
+    if (!instance) return;
+    const { tag } = instance;
+
+    addTagInstance(
+        {
+            template: tag.template,
+            amount: tag.amount,
+            values: tag.values,
+            extraEditable: tag.extraEditable
+        },
+        tagSorting.indexOf(instanceId) + 1
+    );
+}
+
+
+export function removeTagInstance(instanceId: string): void {
+    const instance = tagInstances[instanceId];
+    if (!instance) return;
+
+    const styleId = instance.styleEl?.id;
+    // Remove shared stylesheet only if no other instance uses it
+    const stillUsed = Object.values(tagInstances).some(
+        other => other !== instance && other.styleEl?.id === styleId
+    );
+
+    if (!stillUsed && instance.styleEl.parentElement) {
+        instance.styleEl.remove();
+    }
+
+    delete tagInstances[instanceId];
+    const index = tagSorting.indexOf(instanceId);
+    tagSorting.splice(index, 1);
+
+}
+
+// Renderiza uma etiqueta em um container específico (padrão: printEl)
+export function renderTag(tag: Tag, target: HTMLElement) {
+    const { templateElement } = tag.template;
+    const tagEl = templateElement.firstElementChild!.cloneNode(true) as HTMLElement;
+
+    return target.appendChild(tagEl) ;
 }

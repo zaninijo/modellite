@@ -1,9 +1,9 @@
 import './style.css'
-import type { TagConstructor, TagInstance as TagInstances } from './tags';
-import { Tag } from './tags';
-import v1TagTemplate from './tags/tagv1';
+import type { TagInstances } from './tags';
+import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, renderTag, Tag, tagInstances, tagSorting } from './tags';
+import v1TagTemplate from './tags-models/tagv1';
 import { createPreviewRow } from './preview-tag';
-import { A4263, Sheet, type SheetLayout } from './sheet';
+import { A4263, flushSheets, getTotalEnabledCells, renderTagSheet, Sheet, sheetInstances, type SheetLayout } from './sheet';
 import { waitForLazyElements } from './utils';
 
 // todo depois fazer isso aqui, para salvar o estado da aplicação no localStorage
@@ -16,148 +16,12 @@ interface AppStateStorage {
 const sheetLayout = A4263;
 const tagTemplate = v1TagTemplate;
 
-const sheetInstances: Sheet[] = [];
-
-function getTotalEnabledCells() {
-	return sheetInstances.reduce((sum, sheet) => sum + sheet.totalEnabledCells, 0);
-}
-
-function flushSheets() {
-	sheetInstances.forEach(sheet => {
-		if (!sheet.modified) {
-			sheet.element.remove();
-		} else {
-			sheet.element.replaceChildren();
-		}
-	});
-
-	for (let i = sheetInstances.length - 1; i >= 0; i--) {
-		if (!sheetInstances[i].modified) {
-			sheetInstances.splice(i, 1);
-		}
-	}
-}
-
-//
-// Lógica de gerenciamento de instâncias de etiquetas
-//
 
 const printEl = document.body.appendChild(document.createElement("div"));
 printEl.id = "print-area";
 // demais configurações no CSS
 
 const tagPreviewListEl = document.getElementById("tag-preview-list");
-
-let tagCounter = 0;
-
-function claimTagId(name: string) {
-	const n = tagCounter.valueOf();
-	tagCounter++;
-	return `${name}-${n}`;
-
-}
-
-const tagInstances: TagInstances = {};
-const tagSorting: string[] = [];
-
-function addTagInstance(tagCons: TagConstructor, posIndex?: number): void {
-	const { template } = tagCons;
-	const { templateName } = template;
-
-	let styleEl = document.getElementById(templateName) as HTMLStyleElement;
-
-	const normalizedName = templateName.trim().normalize();
-
-	if (styleEl === null) {
-		styleEl = document.createElement("style");
-		styleEl.textContent = template.templateStyle;
-		document.body.prepend(styleEl);
-		styleEl.id = normalizedName;
-	}
-
-	const instId = claimTagId(normalizedName);
-
-	tagInstances[instId] = {
-		tag: new Tag(tagCons),
-		styleEl
-	}
-
-	posIndex !== undefined
-		? tagSorting.splice(posIndex, 0, instId)
-		: tagSorting.push(instId)
-	;
-	
-	distributeColors();
-	renderTagPreview();
-}
-
-
-function distributeColors() {
-	const colors: string[] = [];
-	const amount = tagSorting.length;
-
-	for (let i = 0; i < amount; i++) {
-		const hue = Math.round((360 / amount) * i);
-		const saturation = 80;
-		const lightness = 50;
-
-		colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
-	}
-
-	tagSorting.forEach((id, i) => {
-		tagInstances[id].color = colors[i];
-	});
-}
-
-function getTagCount() {
-	return Object.values(tagInstances).reduce((sum, inst) => sum + inst.tag.amount, 0);
-}
-
-function duplicateTagInstance(instanceId: string): void {
-	const instance = tagInstances[instanceId];
-	if (!instance) return;
-	const { tag } = instance;
-
-	addTagInstance(
-		{
-			template: tag.template,
-			amount: tag.amount,
-			values: tag.values,
-			extraEditable: tag.extraEditable
-		},
-		tagSorting.indexOf(instanceId) + 1
-	);
-}
-
-
-function removeTagInstance(instanceId: string): void {
-	const instance = tagInstances[instanceId];
-	if (!instance) return;
-
-	const styleId = instance.styleEl?.id;
-	// Remove shared stylesheet only if no other instance uses it
-	const stillUsed = Object.values(tagInstances).some(
-		other => other !== instance && other.styleEl?.id === styleId
-	);
-
-	if (!stillUsed && instance.styleEl.parentElement) {
-		instance.styleEl.remove();
-	}
-
-	delete tagInstances[instanceId];
-	const index = tagSorting.indexOf(instanceId);
-	tagSorting.splice(index, 1);
-
-	renderTagPreview();
-}
-
-// Renderiza uma etiqueta em um container específico (padrão: printEl)
-export function renderTag(tag: Tag, target: HTMLElement) {
-	const { templateElement } = tag.template;
-	const tagEl = templateElement.firstElementChild!.cloneNode(true) as HTMLElement;
-
-	return target.appendChild(tagEl) ;
-}
 
 /**
  * Updates para UI e etc.
@@ -173,8 +37,8 @@ function renderTagPreview() {
 		const row = createPreviewRow(
 			instanceId,
 			instance,
-			() => removeTagInstance(instanceId),
-			() => duplicateTagInstance(instanceId)
+			() => {removeTagInstance(instanceId); renderTagPreview()},
+			() => {duplicateTagInstance(instanceId); renderTagPreview()}
 		);
 		tagPreviewListEl.appendChild(row);
 	});
@@ -200,7 +64,7 @@ async function printResult(fillSheet: SheetLayout, target: HTMLElement = printEl
 	flushPrint();
 	flushSheets();
 
-	const sheetTeste = new Sheet(A4263)
+	const sheetTeste = new Sheet(A4263);
 	sheetTeste.disabledCells[0] = false;
 	sheetTeste.disabledCells[1] = false;
 	sheetTeste.disabledCells[2] = false;
@@ -253,39 +117,6 @@ async function printResult(fillSheet: SheetLayout, target: HTMLElement = printEl
 	window.print();
 }
 
-const emptyCellEl = document.createElement("div");
-emptyCellEl.classList.add("empty-cell");
-
-function renderTagSheet(sheet: Sheet, tagIds: string[], target: HTMLElement = printEl) {
-
-	const { element: sheetEl, disabledCells, totalEnabledCells, totalCells } = sheet;
-
-	if (totalEnabledCells < tagIds.length) {
-		throw new Error("Número de etiquetas excede o número de células habilitadas na folha.");
-	}
-
-	if (tagIds.length <= 0) {
-		throw new Error("Número de etiquetas não pode ser igual ou menor que zero.")
-	}
-	
-	target.appendChild(sheetEl);
-	
-	for (let i = 0; i < totalCells; i++) {
-		if (disabledCells[i]) {
-			sheetEl.appendChild(emptyCellEl.cloneNode(true));
-			continue
-		}
-
-		const tagId = tagIds.shift()!
-
-		const tagInst = tagInstances[tagId];
-		renderTag(tagInst.tag, sheetEl);
-		
-		if (tagIds[0] === undefined) break;
-	}
-}
-
-
 const addTagButton = document.getElementById("add-instance-btn");
 
 addTagButton?.addEventListener("click", () => {
@@ -293,6 +124,7 @@ addTagButton?.addEventListener("click", () => {
 		template: tagTemplate,
 		amount: 1,
 	});
+    renderTagPreview();
 });
 
 const printButton = document.getElementById("print-btn");
@@ -301,4 +133,6 @@ printButton?.addEventListener("click", () => {
 	printResult(sheetLayout);
 });
 
+
 addTagInstance({template: v1TagTemplate, amount: 1})
+renderTagPreview();
