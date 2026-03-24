@@ -5,31 +5,31 @@ const TEMPLATE_NAME = "Etiqueta Base Água V1"
 const CLASS_NAME = "tag-v1";
 
 export interface TagValuesV1 extends TagValuesBase {
-  "name": string;
-  "quantity": string;
-  "size": string;
-  "color": string;
-  "man-date": string;
-  "extras": {
-    "apply-temp": string
-    "ink-type": string
-    "exp-span": string
-  }
+	"name": string;
+	"quantity": string;
+	"size": string;
+	"color": string;
+	"man-date": string;
+	"extras": {
+		"apply-temp": string
+		"ink-type": string
+		"exp-span": string
+	}
 }
 
-const tagDataLabel: {[K in keyof TagValuesV1]: string} = {
-    "name": "Nome",
-    "quantity": "Quantidade",
-    "color": "Cor",
-    "size": "Tamanho",
-    "man-date": "Data de Fabricação",
-    "extras": "Outras opções"
+const tagDataLabel: { [K in keyof TagValuesV1]: string } = {
+	"name": "Nome",
+	"quantity": "Quantidade",
+	"color": "Cor",
+	"size": "Tamanho",
+	"man-date": "Data de Fabricação",
+	"extras": "Outras opções"
 } as const;
 
-const extraTagDataLabel: {[K in keyof TagValuesV1["extras"]]: string} = {
-    "apply-temp": "Temperatura de aplicação",
-    "ink-type": "Tipo da tinta",
-    "exp-span": "Validade"
+const extraTagDataLabel: { [K in keyof TagValuesV1["extras"]]: string } = {
+	"apply-temp": "Temperatura de aplicação",
+	"ink-type": "Tipo da tinta",
+	"exp-span": "Validade"
 } as const;
 
 const css = /*style*/`
@@ -39,7 +39,7 @@ const css = /*style*/`
     font-weight: 400;
     font-size: 5.8pt;
     color: rgba(0,0,0,1);
-    padding: 1mm;
+    padding: 2mm;
     min-height: 38mm;
     min-width: 99mm;
     height: 100%;
@@ -79,16 +79,16 @@ const css = /*style*/`
 
   .${CLASS_NAME} .info-output {
     font-size: 11pt;
-    margin-top: -.15em;
-    margin-bottom: -.15em;
+    margin-block: -.15em;
     font-weight: 500;
     overflow: hidden;
     flex-grow: 1;
   }
 
   .${CLASS_NAME} .medium {
-    font-size: 7.5pt !important;
+    font-size: 6.5pt !important;
     font-weight: 400 !important;
+	line-height: 1.3 !important;
   }
 
   .${CLASS_NAME} .inst-area {
@@ -118,7 +118,7 @@ const css = /*style*/`
   .${CLASS_NAME} .inst-list li {
     letter-spacing: .02em;
     line-height: 1.3;
-    font-size: 6pt;
+    font-size: 5.5pt;
   }
 
   .${CLASS_NAME} .inst-list li::marker {
@@ -225,63 +225,49 @@ const fragment = createTemplate(html);
 
 const tagOutputsQueries = [...Object.keys(tagDataLabel), ...Object.keys(extraTagDataLabel)];
 
-// const tagOutputs = tagInputsQuery.reduce((map, query) => {
-//   if (query === "extras") return map;
-//   const el = fragment.getElementById(query);
-
-//   if (!el) {
-//     throw new Error(
-//       `Erro ao carregar a etiqueta "${TEMPLATE_NAME}": O elemento de output "${query}" não foi encontrado.`
-//     );
-//   }
-
-//   return { ...map, [query]: el };
-// }, {} as {[selector: string]: HTMLElement});
-
-
 const defaultValues = tagOutputsQueries.reduce((map, selector) => {
-  
-  const tagEl = fragment.getElementById(selector);
-  const value = tagEl?.textContent.trim() || "Indefinido";
-  
-  if (selector === "extras") {
-    return map;
-  }
 
-  // Utiliza o dia atual para a data de fabricação, como valor padrão
-  if (selector==="man-date") {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    return {
-      ...map,
-      [selector]: `${day}/${month}/${year}`
-    }
-  }
+	const tagEl = fragment.getElementById(selector);
+	const value = tagEl?.textContent.trim() || "Indefinido";
 
-  // Verifica se é valor extra
-  if (Object.hasOwn(extraTagDataLabel, selector)) {
-    return {
-      ...map,
-      ["extras"]: {
-        ...(map["extras"] as {}),
-        [selector]: value
-      }
-    }
-  } 
+	if (selector === "extras") {
+		return map;
+	}
 
-  return {
-    ...map,
-    [selector]: value
-  }
+	// Utiliza o dia atual para a data de fabricação, como valor padrão
+	if (selector === "man-date") {
+		const today = new Date();
+		const day = String(today.getDate()).padStart(2, '0');
+		const month = String(today.getMonth() + 1).padStart(2, '0');
+		const year = today.getFullYear();
+		return {
+			...map,
+			[selector]: `${day}/${month}/${year}`
+		}
+	}
+
+	// Verifica se é valor extra
+	if (Object.hasOwn(extraTagDataLabel, selector)) {
+		return {
+			...map,
+			["extras"]: {
+				...(map["extras"] as {}),
+				[selector]: value
+			}
+		}
+	}
+
+	return {
+		...map,
+		[selector]: value
+	}
 }, {} as TagValuesBase);
 
 const template: TagTemplate = {
-  templateName: TEMPLATE_NAME,
-  templateElement: fragment,
-  templateStyle: css,
-  tagOutputs: tagOutputsQueries,
-  defaultValues
+	templateName: TEMPLATE_NAME,
+	templateElement: fragment,
+	templateStyle: css,
+	tagOutputs: tagOutputsQueries,
+	defaultValues
 }
 export default template

@@ -1,8 +1,8 @@
 import './style.css'
 import type { TagInstances } from './tags';
-import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, renderTag, tagInstances, tagSorting } from './tags';
+import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, tagInstances, tagSorting } from './tags';
 import v1TagTemplate from './tags-models/tagv1';
-import { createPreviewRow } from './preview-tag';
+import { updateTagEditor } from './tag-editor';
 import { A4263, flushSheets, getTotalEnabledCells, renderTagSheet, Sheet, sheetInstances, type SheetLayout } from './sheet';
 import { waitForLazyElements } from './utils';
 
@@ -26,21 +26,6 @@ const tagPreviewListEl = document.getElementById("tag-preview-list");
 /**
  * Updates para UI e etc.
  */
-
-function renderTagPreview() {
-	if (!tagPreviewListEl) return;
-
-	tagPreviewListEl.replaceChildren();
-
-	tagSorting.forEach(instanceId => {
-		const row = createPreviewRow(
-			instanceId,	
-			() => {removeTagInstance(instanceId); renderTagPreview()},
-			() => {duplicateTagInstance(instanceId); renderTagPreview()}
-		);
-		tagPreviewListEl.appendChild(row);
-	});
-}
 
 
 // Lógica de impressão e renderização do resultado (folha de etiquetas)
@@ -106,7 +91,7 @@ addTagButton?.addEventListener("click", () => {
 		template: tagTemplate,
 		amount: 1,
 	});
-    renderTagPreview();
+    updateTagEditor();
 });
 
 const printButton = document.getElementById("print-btn");
@@ -117,8 +102,4 @@ printButton?.addEventListener("click", () => {
 
 
 addTagInstance({template: v1TagTemplate, amount: 1})
-renderTagPreview();
-
-const tagPreviewV2 = document.querySelector(".tag-preview-v2") as HTMLDivElement;
-const tagContainer = tagPreviewV2.querySelector(".tag-container") as HTMLDivElement;
-renderTag(tagInstances[tagSorting[0]].tag, tagContainer);
+updateTagEditor();

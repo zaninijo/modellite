@@ -1,3 +1,4 @@
+import { sheetLayout } from "./main";
 import { renderTag, tagInstances } from "./tags";
 
 /**
@@ -27,6 +28,18 @@ export interface SheetLayout {
         flowDirection: "column"|"row";
     }
 }
+
+export function calculateCellSize(sheet: SheetLayout) {
+    const colGap = sheet.grid.col.gap * sheet.grid.col.count;
+    const rowGap = sheet.grid.row.gap * sheet.grid.row.count;
+    const cellWidth = (sheet.size.width - sheet.margin.left - sheet.margin.right - rowGap) / sheet.grid.col.count ;
+    const cellHeight = (sheet.size.height - sheet.margin.top - sheet.margin.bottom - colGap) / sheet.grid.row.count;
+    return {
+        width: cellWidth,
+        height: cellHeight
+    }
+}
+
 
 export const A4263: SheetLayout = {
     size: {
