@@ -13,6 +13,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+button {
+  background-color: #fff200;
+  outline: none;
+  border: black 1pt solid;
+  padding: 8px;
+  color: black;
+  font-weight: 600;
+  border-radius: 4px;
+  box-shadow: #24242433 2px 3px 1.5px;
+}
+button:hover {
+  transform: translate(.5px, .5px);
+  background-color: #ffe600;
+  transition: all .1s;
+  box-shadow: #24242444 0 0 3px;
+}
+button:active {
+  transform: translate(.5px, .5px);
+  background-color: #f4dd13;
+  transition: all .1s;
+  box-shadow: #24242444 0 0 3px;
+}
+
 nowrap {
   white-space: nowrap;
 }
@@ -81,31 +104,6 @@ nowrap {
   white-space: nowrap;
 }
 
-/* Estilos para inputs editáveis no preview */
-.editable-input {
-  border: none;
-  background: rgba(0, 0, 0, 0.05);
-  font: inherit;
-  color: inherit;
-  padding: 0;
-  margin: 0;
-  outline: none;
-  width: fit-content;
-  box-sizing: border-box;
-  display: inline-block;
-  min-width: 0;
-}
-
-.editable-input:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.editable-input:focus {
-  background: rgba(255, 255, 0, 0.1);
-  outline: 1px solid #ccc;
-  border-radius: 2px;
-}
-
 /* Estilos para spans editáveis no preview */
 .editable-span {
   background: rgba(0, 0, 0, 0.05);
@@ -122,9 +120,18 @@ nowrap {
 }
 
 .editable-span:focus {
-  background: rgba(255, 255, 0, 0.1);
+  background: rgba(206, 206, 13, 0.429);
   box-shadow: 0 0 0 1px #ccc;
   border-radius: 2px;
+}
+
+.tag-preview-row {
+  padding: 10px;
+}
+
+
+.tag-preview-row button {
+  
 }
 
 .tag-preview {
@@ -152,3 +159,26 @@ nowrap {
   cursor: pointer;
 }
 
+
+.tag-preview-v2 {
+  width: 100%;
+  height: 100px;
+}
+
+.tag-preview-v2 .tag-container {
+  width: 300px;
+  aspect-ratio: 99 / 38.1;
+  position: relative;
+  overflow: hidden;
+}
+
+.tag-preview-v2 .tag-container .tag-v1 {
+  
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  transform-origin: top left;
+
+  transform: scale(80%);
+}

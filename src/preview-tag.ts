@@ -1,7 +1,8 @@
-import { renderTag } from './tags';
-import type { TagInstances } from './tags';
+import { renderTag, tagInstances } from './tags';
 
-export function createPreviewRow(instanceId: string, instance: TagInstances[string], removeCallback: () => void, duplicateCallback: () => void): HTMLElement {
+export function createPreviewRow(instanceId: string, removeCallback: () => void, duplicateCallback: () => void): HTMLElement {
+
+    const instance = tagInstances[instanceId];
 
     const row = document.createElement("div");
     row.className = "tag-preview-row";
@@ -56,9 +57,7 @@ export function createPreviewRow(instanceId: string, instance: TagInstances[stri
     });
     
 
-    const info = document.createElement("div");
-    info.className = "tag-preview-info";
-    info.textContent = `${instanceId}`;
+
 
     const amountInput = document.createElement("input");
     amountInput.type = "number";
@@ -112,8 +111,9 @@ export function createPreviewRow(instanceId: string, instance: TagInstances[stri
     duplicateBtn.className = "tag-preview-duplicate";
     duplicateBtn.addEventListener("click", duplicateCallback);
 
+    preview.title = instanceId;
+
     row.appendChild(preview);
-    row.appendChild(info);
     row.appendChild(amountInput);
     row.appendChild(editExtrasLabel);
     row.appendChild(editExtrasCheckbox);

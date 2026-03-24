@@ -1,6 +1,6 @@
 import './style.css'
 import type { TagInstances } from './tags';
-import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, renderTag, Tag, tagInstances, tagSorting } from './tags';
+import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, renderTag, tagInstances, tagSorting } from './tags';
 import v1TagTemplate from './tags-models/tagv1';
 import { createPreviewRow } from './preview-tag';
 import { A4263, flushSheets, getTotalEnabledCells, renderTagSheet, Sheet, sheetInstances, type SheetLayout } from './sheet';
@@ -13,8 +13,8 @@ interface AppStateStorage {
 	sheetInstances: Sheet[];
 }
 
-const sheetLayout = A4263;
-const tagTemplate = v1TagTemplate;
+export const sheetLayout = A4263;
+export const tagTemplate = v1TagTemplate;
 
 
 const printEl = document.body.appendChild(document.createElement("div"));
@@ -33,10 +33,8 @@ function renderTagPreview() {
 	tagPreviewListEl.replaceChildren();
 
 	tagSorting.forEach(instanceId => {
-		const instance = tagInstances[instanceId];
 		const row = createPreviewRow(
-			instanceId,
-			instance,
+			instanceId,	
 			() => {removeTagInstance(instanceId); renderTagPreview()},
 			() => {duplicateTagInstance(instanceId); renderTagPreview()}
 		);
@@ -63,22 +61,6 @@ async function printResult(fillSheet: SheetLayout, target: HTMLElement = printEl
 
 	flushPrint();
 	flushSheets();
-
-	const sheetTeste = new Sheet(A4263);
-	sheetTeste.disabledCells[0] = false;
-	sheetTeste.disabledCells[1] = false;
-	sheetTeste.disabledCells[2] = false;
-	sheetTeste.disabledCells[3] = false;
-	sheetTeste.disabledCells[4] = false;
-	sheetTeste.disabledCells[5] = false;
-	sheetTeste.disabledCells[6] = false;
-	sheetTeste.disabledCells[7] = false;
-	sheetTeste.disabledCells[8] = false;
-	sheetTeste.disabledCells[9] = false;
-	sheetTeste.disabledCells[10] = false;
-	sheetTeste.disabledCells[11] = false;
-	sheetTeste.disabledCells[12] = false;
-	sheetInstances.push(sheetTeste);
 
 	const totalTags = getTagCount();
 	const cellsPerSheet = fillSheet.grid.col.count * fillSheet.grid.row.count;
@@ -136,3 +118,7 @@ printButton?.addEventListener("click", () => {
 
 addTagInstance({template: v1TagTemplate, amount: 1})
 renderTagPreview();
+
+const tagPreviewV2 = document.querySelector(".tag-preview-v2") as HTMLDivElement;
+const tagContainer = tagPreviewV2.querySelector(".tag-container") as HTMLDivElement;
+renderTag(tagInstances[tagSorting[0]].tag, tagContainer);
