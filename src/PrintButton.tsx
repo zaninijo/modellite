@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import { flushSync } from 'react-dom';
 import { Tag, A4263 } from './types';
 import { Sheet, renderTagSheet } from './print';
 
@@ -27,11 +28,13 @@ const PrintButton: React.FC<PrintButtonProps> = ({ tags }) => {
             const printRoot = printRootRef.current;
 
             if (printRoot) {
-                ReactDOM.render(printContent, printRoot, () => {
-                    window.print();
-                    setIsPrinting(false);
-                    ReactDOM.unmountComponentAtNode(printRoot);
+                const root = createRoot(printRoot);
+                flushSync(() => {
+                    root.render(printContent);
                 });
+                window.print();
+                setIsPrinting(false);
+                root.unmount();
             }
         }
     }, [isPrinting]);

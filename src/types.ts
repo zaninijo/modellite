@@ -16,7 +16,7 @@ export interface TagConstructor extends Partial<TagData> {
 }
 
 export class Tag {
-    public values: TagValues_V1;
+    public values: TagValuesBase;
     public amount;
     public template;
     public extraEditable: boolean;

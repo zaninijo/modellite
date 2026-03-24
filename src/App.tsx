@@ -44,7 +44,6 @@ function App() {
 
   return (
     <div>
-      <h1>Modellite</h1>
       <button onClick={addTag}>Add Tag</button>
       <PrintButton tags={tags} />
       <TagList

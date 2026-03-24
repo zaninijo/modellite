@@ -25,7 +25,7 @@ const TagComponent: React.FC<TagProps> = ({ tag, onUpdate, isEditable }) => {
         }
 
         return () => {
-            // TODO: check if other tags are using this style before removing it
+            
         };
     }, [tag.template.templateName, tag.template.templateStyle]);
 
