@@ -1,5 +1,5 @@
 import { createTemplate } from "../utils";
-import type { TagValuesBase, TagTemplate } from "../tags";
+import type { TagValuesBase, TagTemplate } from "../types";
 
 const TEMPLATE_NAME = "Etiqueta Base Água V1"
 const CLASS_NAME = "tag-v1";
