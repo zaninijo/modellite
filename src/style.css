@@ -3,7 +3,7 @@
   line-height: 1.5;
   text-anchor: middle;
   font-weight: 400;
-  font-size: 5.8pt;
+  font-size: 8pt;
   color-scheme: light dark;
   color: rgba(0, 0, 0, 1);
   background-color: #242424;
@@ -19,9 +19,11 @@ button {
   border: black 1pt solid;
   padding: 8px;
   color: black;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 4px;
   box-shadow: #24242433 2px 3px 1.5px;
+  box-sizing: border-box;
 }
 button:hover {
   transform: translate(.5px, .5px);
@@ -59,7 +61,16 @@ nowrap {
 }
 
 body {
-  background-color: white;
+    /* cores/nitidez/tamanho do ponto */
+  background-image: radial-gradient(#f7f6d1 25%, #FFFED7 20%);
+  /* tamanho do padrão */
+  background-size: 5px 5px; 
+  background-position: 0 0;
+  height: 100dvh;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
 }
 
 a {
@@ -69,6 +80,10 @@ a {
 }
 a:hover {
   color: #535bf2;
+}
+
+input[type="checkbox"] {
+  accent-color: #fff200;
 }
 
 @media print {
@@ -82,6 +97,7 @@ a:hover {
   }
 
   #print-area {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -93,11 +109,14 @@ a:hover {
 }
 
 #print-area {
-  visibility: visible;
+  visibility: hidden;
+  background-color: white;
+  height: 0;
 }
 
 .sheet {
   border: 1px solid #ccc;
+  background-color: white;
 }
 
 nowrap {
@@ -126,45 +145,188 @@ nowrap {
   border-radius: 2px;
 }
 
+.main-controls-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 20px 10px;
+
+  background-image: radial-gradient(#fff200 10%, #f9e33e 90%);
+  /* tamanho do padrão */
+  background-size: 5px 5px; 
+  background-position: center center;
+  border-top: 1.3px black solid;
+  box-shadow: inset #519f7baa 0 -2px 8px -1px;
+}
+
 #tag-editor-root {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   width: fit-content;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+#editable-tag-list {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  
 }
 
 .editable-tag-row {
   background-color: #F6F6F6;
   width: auto;
   height: fit-content;
-  padding: 10px 12px;
+  padding: 12px 10px;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: 12px;
+  border-top: 1px #0000000A solid;
+  transition: filter .1s ease;
 }
 
 .editable-tag-container {
-  max-height: 200px;
-  max-width: 450px;
   width: min-content;
   height: auto;
   overflow: hidden;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 3mm;
   box-sizing: border-box;
+  box-shadow: #24242422 0 0 3px;
+  flex-grow: 1;
 }
-
 
 .editor-controls-container {
   display: flex;
   flex-direction: column;
   align-items: start;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 10px;
+  width: max-content;
+}
+
+.editor-controls-container label {
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.2;
+  align-self: center;
+  color: #5B5B5B;
+  font-weight: 500;
+}
+
+.editor-controls-container div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 5px;
+  box-sizing: border-box;
 }
 
 .editable-tag-row .dragable-area {
-  height: 100%;
-  width: 13px;
-  background-color: #D9D9D9;
+  width: 20px;
   cursor: grab;
   align-self: stretch;
   box-sizing: border-box;
+  margin-block: .5px;
+
+  /* cores/nitidez/tamanho do ponto */
+  background-image: radial-gradient(#00000033 20%, #00000000 30%);
+  /* tamanho do padrão */
+  background-size: 4px 4px;
+  background-position: 0 center;
+}
+
+#tag-id {
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 1;
+  width: 12em;
+}
+
+#color-id {
+  height: 8px;
+  width: 8px;
+  border-radius: 100%;
+  transition: background-color .2s ease-out;
+  box-sizing: content-box;
+}
+
+#clone-btn {
+  flex-grow: 1;
+  align-self: stretch;
+}
+
+#remove-btn {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  padding: 4px;
+  background-color: #FF5900;
+}
+
+#remove-btn:hover {
+  background-color: #f15501;
+}
+
+#amount-input {
+  width: 50px;
+}
+
+
+/* prefira usar como exemplo */
+.polka-pattern-template {
+  /* cores/nitidez/tamanho do ponto */
+  background-image: radial-gradient(#212121 25%, #00000000 20%);
+  /* tamanho do padrão */
+  background-size: 2px 2px; 
+  background-position: 0 0;
+}
+
+#sheet-editor-root {
+  display: inline-flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-start;
+  align-items: center;
+  min-width: fit-content;
+  height: 100%;
+  padding: 20px;
+  gap: 10px;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+.editable-sheet {
+  flex: 0 0 auto;
+}
+
+.cell-preview {
+  outline: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 5px;
+  outline-offset: -1px;
+}
+
+.occupied-cell {
+  outline: solid 1.2px;
+  outline-offset: -1.35px;
+  box-shadow: 0px 0px 1px #00000055;
+}
+
+.disabled-cell {
+  border: none;
+  background-color: #FFD7D7;
+  box-shadow: 0px 0px 2px #00000055 inset;
 }

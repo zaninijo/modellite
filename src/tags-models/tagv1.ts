@@ -1,7 +1,7 @@
 import { createTemplate } from "../utils";
 import type { TagValuesBase, TagTemplate } from "../tags";
 
-const TEMPLATE_NAME = "Etiqueta Base Água V1"
+const TEMPLATE_NAME = "etiqueta base água"
 const CLASS_NAME = "tag-v1";
 
 export interface TagValuesV1 extends TagValuesBase {
@@ -53,6 +53,7 @@ const css = /*style*/`
     display: flex;
     flex-direction: row;
     border: .8pt black solid;
+    border-radius: 1.5mm;
     box-sizing: border-box;
     width: 100%;
   }

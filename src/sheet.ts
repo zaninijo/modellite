@@ -1,4 +1,3 @@
-import { sheetLayout } from "./main";
 import { renderTag, tagInstances } from "./tags";
 
 /**
@@ -80,25 +79,50 @@ export class Sheet {
         this._element = document.createElement("div");
         this._element.classList.add("sheet");
 
-        this._element.style.width = `${layout.size.width}mm`;
-        this._element.style.height = `${layout.size.height}mm`;
-        this._element.style.maxWidth = `${layout.size.width}mm`;
-        this._element.style.maxHeight = `${layout.size.height}mm`;
-        this._element.style.paddingTop = `${layout.margin.top}mm`;
-        this._element.style.paddingRight = `${layout.margin.right}mm`;
-        this._element.style.paddingBottom = `${layout.margin.bottom}mm`;
-        this._element.style.paddingLeft = `${layout.margin.left}mm`;
-        this._element.style.display = "grid";
-        this._element.style.gridAutoFlow = `${layout.grid.flowDirection}`;
-        this._element.style.gridTemplateColumns = `repeat(${layout.grid.col.count}, 1fr)`;
-        this._element.style.gridTemplateRows = `repeat(${layout.grid.row.count}, 1fr)`;
-        this._element.style.columnGap = `${layout.grid.col.gap}mm`;
-        this._element.style.rowGap = `${layout.grid.row.gap}mm`;
+        Sheet.resizeLayout(this._element, this._layout, 1, "mm");
         this._element.style.boxSizing = "border-box";
 
         this._disabledCells = new Array(this.totalCells).fill(false);
 
         this.modified = false;
+    }
+
+    static resizeLayout(element: HTMLElement, layout: SheetLayout, scale: number, unit: "mm" | "px") {
+        const pxPerMm = 3.78;
+
+        if (unit === "px") {
+            const effectiveScale = scale * pxPerMm;
+            element.style.width = `${layout.size.width * effectiveScale}px`;
+            element.style.height = `${layout.size.height * effectiveScale}px`;
+            element.style.maxWidth = `${layout.size.width * effectiveScale}px`;
+            element.style.maxHeight = `${layout.size.height * effectiveScale}px`;
+
+            element.style.paddingTop = `${layout.margin.top * pxPerMm}px`;
+            element.style.paddingRight = `${layout.margin.right * pxPerMm}px`;
+            element.style.paddingBottom = `${layout.margin.bottom * pxPerMm}px`;
+            element.style.paddingLeft = `${layout.margin.left * pxPerMm}px`;
+
+            element.style.columnGap = `${layout.grid.col.gap * pxPerMm}px`;
+            element.style.rowGap = `${layout.grid.row.gap * pxPerMm}px`;
+        } else {
+            element.style.width = `${layout.size.width * scale}mm`;
+            element.style.height = `${layout.size.height * scale}mm`;
+            element.style.maxWidth = `${layout.size.width * scale}mm`;
+            element.style.maxHeight = `${layout.size.height * scale}mm`;
+
+            element.style.paddingTop = `${layout.margin.top * scale}mm`;
+            element.style.paddingRight = `${layout.margin.right * scale}mm`;
+            element.style.paddingBottom = `${layout.margin.bottom * scale}mm`;
+            element.style.paddingLeft = `${layout.margin.left * scale}mm`;
+
+            element.style.columnGap = `${layout.grid.col.gap}mm`;
+            element.style.rowGap = `${layout.grid.row.gap}mm`;
+        }
+
+        element.style.display = "grid";
+        element.style.gridAutoFlow = `${layout.grid.flowDirection}`;
+        element.style.gridTemplateColumns = `repeat(${layout.grid.col.count}, 1fr)`;
+        element.style.gridTemplateRows = `repeat(${layout.grid.row.count}, 1fr)`;
     }
 
     set disabledCells(cells: boolean[]) {
@@ -134,30 +158,8 @@ export class Sheet {
     }
 };
 
-export const sheetInstances: Sheet[] = [];
-
-export function getTotalEnabledCells() {
-	return sheetInstances.reduce((sum, sheet) => sum + sheet.totalEnabledCells, 0);
-}
-
-export function flushSheets() {
-	sheetInstances.forEach(sheet => {
-		if (!sheet.modified) {
-			sheet.element.remove();
-		} else {
-			sheet.element.replaceChildren();
-		}
-	});
-
-	for (let i = sheetInstances.length - 1; i >= 0; i--) {
-		if (!sheetInstances[i].modified) {
-			sheetInstances.splice(i, 1);
-		}
-	}
-}
-
-const emptyCellEl = document.createElement("div");
-emptyCellEl.classList.add("empty-cell");
+export const emptyCellEl = document.createElement("div");
+emptyCellEl.classList.add("cell");
 
 export function renderTagSheet(sheet: Sheet, tagIds: string[], target: HTMLElement) {
 

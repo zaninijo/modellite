@@ -98,6 +98,18 @@ function claimTagId(name: string) {
 export const tagInstances: TagInstances = {};
 export const tagSorting: string[] = [];
 
+export function getTagList() {
+    return tagSorting.reduce((arr, id) => {
+		const amount = tagInstances[id].tag.amount
+	
+		for (let i = 0; i < amount; i++) {
+			arr.push(id)
+		}
+	
+		return arr
+	}, [] as string[])
+}
+
 export function addTagInstance(tagCons: TagConstructor, posIndex?: number): void {
     const { template } = tagCons;
     const { templateName } = template;
@@ -124,8 +136,6 @@ export function addTagInstance(tagCons: TagConstructor, posIndex?: number): void
         ? tagSorting.splice(posIndex, 0, instId)
         : tagSorting.push(instId)
     ;
-    
-    distributeColors();
 }
 
 
@@ -135,8 +145,8 @@ export function distributeColors() {
 
     for (let i = 0; i < amount; i++) {
         const hue = Math.round((360 / amount) * i);
-        const saturation = 80;
-        const lightness = 50;
+        const saturation = 95;
+        const lightness = 70;
 
         colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }
@@ -171,6 +181,10 @@ export function removeTagInstance(instanceId: string): void {
     const instance = tagInstances[instanceId];
     if (!instance) return;
 
+    if (tagSorting.length === 1) {
+        return;
+    }
+
     const styleId = instance.styleEl?.id;
     // Remove shared stylesheet only if no other instance uses it
     const stillUsed = Object.values(tagInstances).some(
@@ -184,7 +198,6 @@ export function removeTagInstance(instanceId: string): void {
     delete tagInstances[instanceId];
     const index = tagSorting.indexOf(instanceId);
     tagSorting.splice(index, 1);
-
 }
 
 // Renderiza uma etiqueta em um container específico (padrão: printEl)

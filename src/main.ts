@@ -1,10 +1,11 @@
 import './style.css'
 import type { TagInstances } from './tags';
-import { addTagInstance, duplicateTagInstance, getTagCount, removeTagInstance, tagInstances, tagSorting } from './tags';
+import { addTagInstance, getTagCount, getTagList, tagInstances, tagSorting } from './tags';
 import v1TagTemplate from './tags-models/tagv1';
-import { updateTagEditor } from './tag-editor';
-import { A4263, flushSheets, getTotalEnabledCells, renderTagSheet, Sheet, sheetInstances, type SheetLayout } from './sheet';
+import { editableTagList, scrollToIndex as scrollEditorToIndex, updateTagEditor } from './tag-editor';
+import { A4263, renderTagSheet, Sheet, type SheetLayout } from './sheet';
 import { waitForLazyElements } from './utils';
+import { flushSheets, getTotalEnabledCells, sheetInstances } from './sheet-manager';
 
 // todo depois fazer isso aqui, para salvar o estado da aplicação no localStorage
 interface AppStateStorage {
@@ -61,16 +62,7 @@ async function printResult(fillSheet: SheetLayout, target: HTMLElement = printEl
 		sheetInstances.push(newSheet);
 	}
 
-	const tagsToRender: string[] = tagSorting.reduce((arr, id) => {
-		const amount = tagInstances[id].tag.amount
-	
-		for (let i = 0; i < amount; i++) {
-			arr.push(id)
-		}
-	
-		return arr
-	}, [] as string[])
-
+	const tagsToRender: string[] = getTagList();
 	sheetInstances.forEach(sheet => {
 		const enabledCells = sheet.totalEnabledCells
 		const tagsToPrint = tagsToRender.splice(0, enabledCells);
@@ -92,6 +84,7 @@ addTagButton?.addEventListener("click", () => {
 		amount: 1,
 	});
     updateTagEditor();
+	scrollEditorToIndex(tagSorting.length - 1);
 });
 
 const printButton = document.getElementById("print-btn");
