@@ -21,7 +21,7 @@ const editorRowHtml = /*html*/`
             <div style="flex-grow: 1;"></div>
             <div>
                 <label for="amount-input">Quantidade:</label>
-                <input type="number" id="amount-input" min=1>
+                <input type="number" id="amount-input" min=1 max=99 maxlength=2>
             </div>
             <div>
                 <label for="edit-extras">Editar Extras:</label>
@@ -108,7 +108,9 @@ export function createTagEditorRow(
     const amountInput = rowEl.querySelector("#amount-input") as HTMLInputElement;
     amountInput.value = String(instance.tag.amount);
     amountInput.addEventListener("input", () => {
-        instance.tag.amount = parseInt(amountInput.value) || 0;
+        const amount = Math.max(1, Math.min(99, parseInt(amountInput.value) || 0));
+        instance.tag.amount = amount;
+        amountInput.value = amount.toString();
         updateSheetEditor();
     });
 

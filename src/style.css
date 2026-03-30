@@ -87,10 +87,21 @@ input[type="checkbox"] {
 }
 
 @media print {
+  body {
+    display: block !important;
+    box-sizing: border-box;
+    height: fit-content;
+  }
+
   body * {
     visibility: hidden;
   }
 
+  .sheet {
+    border: none !important;
+    box-shadow: none;
+  }
+  
   #print-area,
   #print-area * {
     visibility: visible;
@@ -114,9 +125,11 @@ input[type="checkbox"] {
   height: 0;
 }
 
-.sheet {
+.editable-sheet {
   border: 1px solid #ccc;
   background-color: white;
+  box-shadow: 0 0 5px #00000022;
+  flex: 0 0 auto;
 }
 
 nowrap {
@@ -306,10 +319,6 @@ nowrap {
   overflow-y: scroll;
   box-sizing: border-box;
   scrollbar-width: none;
-}
-
-.editable-sheet {
-  flex: 0 0 auto;
 }
 
 .cell-preview {

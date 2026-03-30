@@ -19,6 +19,23 @@ function getGlobalCellIndex(sheetIndex: number, cellIndex: number): number {
     return cellCount + cellIndex;
 }
 
+function getGlobalEnabledCellIndex(sheetIndex: number, cellIndex: number): number {
+    let enabledIndex = 0;
+
+    for (let i = 0; i < sheetIndex; i++) {
+        enabledIndex += sheetInstances[i].totalEnabledCells;
+    }
+
+    const sheet = sheetInstances[sheetIndex];
+    for (let i = 0; i < cellIndex; i++) {
+        if (!sheet.disabledCells[i]) {
+            enabledIndex++;
+        }
+    }
+
+    return enabledIndex;
+}
+
 export function flushSheets() {
 	sheetInstances.forEach(sheet => {
 		if (!sheet.modified) {
@@ -68,11 +85,10 @@ function createEditableSheet(sheetInstance: Sheet): HTMLElement {
 
         if (isDisabled) continue;
 
-        const globalCellIndex = getGlobalCellIndex(sheetIndex, cellIndex,);
+        const globalCellIndex = getGlobalEnabledCellIndex(sheetIndex, cellIndex);
 
         const tagList = getTagList();
         const tagInst = tagInstances[tagList[globalCellIndex]];
-        
 
         if (tagList[globalCellIndex]) {
             cellEl.classList.add("occupied-cell");
@@ -128,6 +144,8 @@ export function updateSheetEditor() {
         const targetHeight = .98 * availableHeight;
         const elScale = targetHeight / baseHeight;
 
-        Sheet.resizeLayout(sheet.element, sheet.layout, elScale, "px");
+        Sheet.resizeLayout(sheet.element, sheet.layout, elScale, "px"); 
     });
 }
+
+window.addEventListener("resize", updateSheetEditor);

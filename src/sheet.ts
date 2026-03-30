@@ -97,13 +97,13 @@ export class Sheet {
             element.style.maxWidth = `${layout.size.width * effectiveScale}px`;
             element.style.maxHeight = `${layout.size.height * effectiveScale}px`;
 
-            element.style.paddingTop = `${layout.margin.top * pxPerMm}px`;
-            element.style.paddingRight = `${layout.margin.right * pxPerMm}px`;
-            element.style.paddingBottom = `${layout.margin.bottom * pxPerMm}px`;
-            element.style.paddingLeft = `${layout.margin.left * pxPerMm}px`;
+            element.style.paddingTop = `${layout.margin.top * effectiveScale}px`;
+            element.style.paddingRight = `${layout.margin.right * effectiveScale}px`;
+            element.style.paddingBottom = `${layout.margin.bottom * effectiveScale}px`;
+            element.style.paddingLeft = `${layout.margin.left * effectiveScale}px`;
 
-            element.style.columnGap = `${layout.grid.col.gap * pxPerMm}px`;
-            element.style.rowGap = `${layout.grid.row.gap * pxPerMm}px`;
+            element.style.columnGap = `${layout.grid.col.gap * effectiveScale}px`;
+            element.style.rowGap = `${layout.grid.row.gap * effectiveScale}px`;
         } else {
             element.style.width = `${layout.size.width * scale}mm`;
             element.style.height = `${layout.size.height * scale}mm`;
