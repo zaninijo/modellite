@@ -13,6 +13,27 @@ export function flattenObject(obj: AnyObject, result: AnyObject = {}): AnyObject
   return result;
 }
 
+export type HslObject = {
+  h: number;
+  s: number;
+  l: number;
+};
+
+export function parseHsl(hslString: string): HslObject {
+  const regex = /^hsl\(\s*([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)%\s*,\s*([+-]?\d+(?:\.\d+)?)%\s*\)$/i;
+  const match = hslString.trim().match(regex);
+
+  if (!match) {
+    throw new Error(`Formato inválido para HSL: "${hslString}". Use "hsl(° , % , % )".`);
+  }
+
+  return {
+    h: Number(match[1]),
+    s: Number(match[2]),
+    l: Number(match[3]),
+  };
+}
+
 export function createTemplate(str: string) {
     const template = document.createElement("template");
     template.innerHTML = str.trim();

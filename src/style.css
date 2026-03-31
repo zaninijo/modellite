@@ -109,7 +109,6 @@ input[type="checkbox"] {
 
   #print-area {
     display: block;
-    position: absolute;
     top: 0;
     left: 0;
   }
@@ -123,6 +122,7 @@ input[type="checkbox"] {
   visibility: hidden;
   background-color: white;
   height: 0;
+  position: absolute;
 }
 
 .editable-sheet {
@@ -190,7 +190,10 @@ nowrap {
   overflow-x: hidden;
   scrollbar-width: thin;
   scroll-behavior: smooth;
-  
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .editable-tag-row {
@@ -215,6 +218,8 @@ nowrap {
   box-sizing: border-box;
   box-shadow: #24242422 0 0 3px;
   flex-grow: 1;
+  border: 1.5px solid transparent;
+  transition: border-color .2s ease-out;
 }
 
 .editor-controls-container {
@@ -329,13 +334,17 @@ nowrap {
 }
 
 .occupied-cell {
-  outline: solid 1.2px;
-  outline-offset: -1.35px;
+  outline: solid 1.5px transparent;
+  background-color: transparent;
+  outline-offset: -1.5px;
   box-shadow: 0px 0px 1px #00000055;
+  transition: outline-color .2s ease-out;
+  transition: background-color .5s ease-out;
 }
 
 .disabled-cell {
-  border: none;
-  background-color: #FFD7D7;
-  box-shadow: 0px 0px 2px #00000055 inset;
+  border: 1px inset #c60202;
+  background-color: #ffffff;
+  outline: none;
+  box-shadow: 0px 0px 5px 4px #ff020258 inset;
 }

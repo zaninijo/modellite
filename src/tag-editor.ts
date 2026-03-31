@@ -31,8 +31,8 @@ const editorRowHtml = /*html*/`
                 <button id="clone-btn">Duplicar</button>
                 <button id="remove-btn"></button>
             </div>
+            
         </div>
-
     </div>
 `;
 
@@ -61,6 +61,7 @@ export function createTagEditorRow(
     // transição de cores pra ficar swag
     setTimeout(() => {
         colorIdEl.style.backgroundColor = instance.color || "transparent";
+        previewArea.style.borderColor = instance.color || "transparent";
     }, 10);
 
 

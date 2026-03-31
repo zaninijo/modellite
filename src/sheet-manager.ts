@@ -1,6 +1,7 @@
 import { sheetLayout } from "./main";
 import { emptyCellEl, Sheet, type SheetLayout } from "./sheet";
 import { getTagCount, getTagList, tagInstances, tagSorting } from "./tags";
+import { parseHsl } from "./utils";
 
 export const sheetInstances: Sheet[] = [];
 
@@ -90,9 +91,17 @@ function createEditableSheet(sheetInstance: Sheet): HTMLElement {
         const tagList = getTagList();
         const tagInst = tagInstances[tagList[globalCellIndex]];
 
+        const outlineColor = tagInst?.color || "transparent";
+
+        const c = tagInst?.color ? parseHsl(tagInst.color!) : {h: 0, s: 0, l: 0};
+        const backgroundColor = `hsl(${c.h}, ${c.s}%, ${Math.min(c.l + 35, 95)}%)`;
+
         if (tagList[globalCellIndex]) {
             cellEl.classList.add("occupied-cell");
-            cellEl.style.outlineColor = tagInst.color || "black";
+            setTimeout(() => {
+                cellEl.style.outlineColor = outlineColor;
+                cellEl.style.backgroundColor = backgroundColor;
+            }, 10*globalCellIndex*3);
         }
     }
 
