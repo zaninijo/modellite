@@ -77,8 +77,6 @@ function createEditableSheet(sheetInstance: Sheet): HTMLElement {
             newDisabled[cellIndex] = !isDisabled;
             sheetInstance.disabledCells = newDisabled;
             
-            console.log(`Sheet ${sheetIndex}, Cell ${cellIndex} is now ${sheetInstance.disabledCells[cellIndex] ? "disabled" : "enabled"}.`);
-            
             updateSheetEditor();
         });
 

@@ -111,7 +111,6 @@ export function createTagEditorRow(
     amountInput.addEventListener("input", () => {
         const amount = Math.max(1, Math.min(99, parseInt(amountInput.value) || 0));
         instance.tag.amount = amount;
-        amountInput.value = amount.toString();
         updateSheetEditor();
     });
 

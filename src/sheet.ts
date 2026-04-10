@@ -80,7 +80,6 @@ export class Sheet {
         this._element.classList.add("sheet");
 
         Sheet.resizeLayout(this._element, this._layout, 1, "mm");
-        this._element.style.boxSizing = "border-box";
 
         this._disabledCells = new Array(this.totalCells).fill(false);
 
@@ -88,36 +87,21 @@ export class Sheet {
     }
 
     static resizeLayout(element: HTMLElement, layout: SheetLayout, scale: number, unit: "mm" | "px") {
-        const pxPerMm = 3.78;
+        const pxPerMm = 96 / 25.4;
+        const effectiveScale = scale * pxPerMm;
 
-        if (unit === "px") {
-            const effectiveScale = scale * pxPerMm;
-            element.style.width = `${layout.size.width * effectiveScale}px`;
-            element.style.height = `${layout.size.height * effectiveScale}px`;
-            element.style.maxWidth = `${layout.size.width * effectiveScale}px`;
-            element.style.maxHeight = `${layout.size.height * effectiveScale}px`;
+        element.style.width = `${layout.size.width * effectiveScale}px`;
+        element.style.height = `${layout.size.height * effectiveScale}px`;
+        element.style.maxWidth = `${layout.size.width * effectiveScale}px`;
+        element.style.maxHeight = `${layout.size.height * effectiveScale}px`;
 
-            element.style.paddingTop = `${layout.margin.top * effectiveScale}px`;
-            element.style.paddingRight = `${layout.margin.right * effectiveScale}px`;
-            element.style.paddingBottom = `${layout.margin.bottom * effectiveScale}px`;
-            element.style.paddingLeft = `${layout.margin.left * effectiveScale}px`;
+        element.style.paddingTop = `${layout.margin.top * effectiveScale}px`;
+        element.style.paddingRight = `${layout.margin.right * effectiveScale}px`;
+        element.style.paddingBottom = `${layout.margin.bottom * effectiveScale}px`;
+        element.style.paddingLeft = `${layout.margin.left * effectiveScale}px`;
 
-            element.style.columnGap = `${layout.grid.col.gap * effectiveScale}px`;
-            element.style.rowGap = `${layout.grid.row.gap * effectiveScale}px`;
-        } else {
-            element.style.width = `${layout.size.width * scale}mm`;
-            element.style.height = `${layout.size.height * scale}mm`;
-            element.style.maxWidth = `${layout.size.width * scale}mm`;
-            element.style.maxHeight = `${layout.size.height * scale}mm`;
-
-            element.style.paddingTop = `${layout.margin.top * scale}mm`;
-            element.style.paddingRight = `${layout.margin.right * scale}mm`;
-            element.style.paddingBottom = `${layout.margin.bottom * scale}mm`;
-            element.style.paddingLeft = `${layout.margin.left * scale}mm`;
-
-            element.style.columnGap = `${layout.grid.col.gap}mm`;
-            element.style.rowGap = `${layout.grid.row.gap}mm`;
-        }
+        element.style.columnGap = `${layout.grid.col.gap * effectiveScale}px`;
+        element.style.rowGap = `${layout.grid.row.gap * effectiveScale}px`;
 
         element.style.display = "grid";
         element.style.gridAutoFlow = `${layout.grid.flowDirection}`;

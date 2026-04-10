@@ -100,17 +100,15 @@ input[type="checkbox"] {
   .sheet {
     border: none !important;
     box-shadow: none;
+    overflow: hidden;
+    box-sizing: border-box;
+    break-after: page;
+
   }
   
   #print-area,
   #print-area * {
     visibility: visible;
-  }
-
-  #print-area {
-    display: block;
-    top: 0;
-    left: 0;
   }
 }
 
@@ -121,8 +119,10 @@ input[type="checkbox"] {
 #print-area {
   visibility: hidden;
   background-color: white;
-  height: 0;
   position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 
 .editable-sheet {
@@ -180,9 +180,13 @@ nowrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: fit-content;
+  flex-grow: 1;
   height: 100%;
   justify-content: flex-end;
+  box-shadow: 0 0 5px 5px #00000011;
+  background-image: radial-gradient(#c0c0c0 10%, #b7b7b7 90%);
+  background-size: 3px 3px; 
+  background-position: center center;
 }
 
 #editable-tag-list {
@@ -191,6 +195,7 @@ nowrap {
   scrollbar-width: thin;
   scroll-behavior: smooth;
   max-height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -217,7 +222,7 @@ nowrap {
   border-radius: 3mm;
   box-sizing: border-box;
   box-shadow: #24242422 0 0 3px;
-  flex-grow: 1;
+  flex-grow: 0;
   border: 1.5px solid transparent;
   transition: border-color .2s ease-out;
 }
@@ -225,6 +230,7 @@ nowrap {
 .editor-controls-container {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   align-items: start;
   justify-content: space-between;
   align-self: stretch;
