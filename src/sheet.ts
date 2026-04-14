@@ -86,7 +86,7 @@ export class Sheet {
         this.modified = false;
     }
 
-    static resizeLayout(element: HTMLElement, layout: SheetLayout, scale: number, unit: "mm" | "px") {
+    static resizeLayout(element: HTMLElement, layout: SheetLayout, scale: number, _unit: "mm" | "px") {
         const pxPerMm = 96 / 25.4;
         const effectiveScale = scale * pxPerMm;
 

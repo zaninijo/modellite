@@ -1,8 +1,7 @@
 import './style.css'
-import type { TagInstances } from './tags';
-import { addTagInstance, getTagCount, getTagList, tagInstances, tagSorting } from './tags';
+import { addTagInstance, getTagCount, getTagList, tagSorting, type TagInstances } from './tags';
 import v1TagTemplate from './tags-models/tagv1';
-import { editableTagList, scrollToIndex as scrollEditorToIndex, updateTagEditor } from './tag-editor';
+import { scrollToIndex as scrollEditorToIndex, updateTagEditor } from './tag-editor';
 import { A4263, renderTagSheet, Sheet, type SheetLayout } from './sheet';
 import { waitForLazyElements } from './utils';
 import { flushSheets, getTotalEnabledCells, sheetInstances } from './sheet-manager';
@@ -22,7 +21,6 @@ const printEl = document.body.appendChild(document.createElement("div"));
 printEl.id = "print-area";
 // demais configurações no CSS
 
-const tagPreviewListEl = document.getElementById("tag-preview-list");
 
 /**
  * Updates para UI e etc.
@@ -33,6 +31,13 @@ const tagPreviewListEl = document.getElementById("tag-preview-list");
 
 function flushPrint() {
 	printEl.replaceChildren();
+}
+
+function applyPrintSheetSize(layout: SheetLayout, target: HTMLElement = printEl) {
+	document.documentElement.style.setProperty("--print-sheet-width", `${layout.size.width}mm`);
+	document.documentElement.style.setProperty("--print-sheet-height", `${layout.size.height}mm`);
+	document.documentElement.style.setProperty("--print-sheet-padding", `${layout.margin.top}mm ${layout.margin.right}mm ${layout.margin.bottom}mm ${layout.margin.left}mm`);
+	document.documentElement.style.setProperty("--print-sheet-size", `${layout.size.width}mm ${layout.size.height}mm`);
 }
 
 /**
@@ -46,6 +51,7 @@ async function printResult(fillSheet: SheetLayout, target: HTMLElement = printEl
 	// Vou implementar uma interface de gerenciamento de folhas para o usuário depois.
 
 	flushPrint();
+	applyPrintSheetSize(fillSheet, target);
 	flushSheets();
 
 	const totalTags = getTagCount();

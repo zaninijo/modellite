@@ -99,7 +99,7 @@ function createEditableSheet(sheetInstance: Sheet): HTMLElement {
             setTimeout(() => {
                 cellEl.style.outlineColor = outlineColor;
                 cellEl.style.backgroundColor = backgroundColor;
-            }, 10*globalCellIndex*3);
+            }, 500*globalCellIndex/getTotalEnabledCells());
         }
     }
 

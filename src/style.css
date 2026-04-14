@@ -97,23 +97,41 @@ input[type="checkbox"] {
     visibility: hidden;
   }
 
-  .sheet {
-    border: none !important;
-    box-shadow: none;
-    overflow: hidden;
-    box-sizing: border-box;
-    break-after: page;
-
-  }
-  
   #print-area,
   #print-area * {
     visibility: visible;
   }
+
+  #print-area {
+    display: block;
+    box-sizing: border-box;
+    width: 100vw;
+    min-height: 100vh;
+  }
+
+  .sheet {
+    border: none !important;
+    box-shadow: none;
+    box-sizing: border-box;
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 0 !important;
+    display: grid !important;
+    overflow: hidden;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 !important;
+  }
+
+  .sheet > * {
+    break-inside: avoid;
+  }
 }
 
 @page {
-  margin: 0;
+  size: var(--print-sheet-size, A4);
+  margin: var(--print-sheet-padding);
 }
 
 #print-area {
